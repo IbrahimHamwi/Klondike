@@ -72,11 +72,11 @@ export class Klondike extends Component {
                 let newCard = instantiate(this.card);
                 let xoffset = newCard.getComponent(UITransform).contentSize.width / 2
                 newCard.setRotation(math.quat(0, 0, 0, 1));
-                newCard.setPosition(this.bottomPos[i].worldPosition.x, this.bottomPos[i].position.y + yoffset, this.bottomPos[i].position.z - zoffset);
                 newCard.name = card;
                 newCard.getComponent(Selectable).faceup = true;
                 console.log("KlondikeDeal: " + card);
                 this.bottomPos[i].addChild(newCard);
+                newCard.setWorldPosition(this.bottomPos[i].worldPosition.x, this.bottomPos[i].worldPosition.y + yoffset, this.bottomPos[i].worldPosition.z - zoffset);
                 yoffset -= 30;
             });
         }

@@ -24,17 +24,17 @@
         "__id__": 2
       },
       {
-        "__id__": 4
+        "__id__": 3
       },
       {
-        "__id__": 6
+        "__id__": 5
       },
       {
-        "__id__": 8
+        "__id__": 7
       }
     ],
     "_prefab": {
-      "__id__": 10
+      "__id__": 9
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -51,8 +51,8 @@
     },
     "_lscale": {
       "__type__": "cc.Vec3",
-      "x": 0.2,
-      "y": 0.2,
+      "x": 1,
+      "y": 1,
       "z": 1
     },
     "_layer": 33554432,
@@ -73,13 +73,11 @@
       "__id__": 1
     },
     "_enabled": true,
-    "__prefab": {
-      "__id__": 3
-    },
+    "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 484,
-      "height": 726
+      "width": 100,
+      "height": 145.2
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -87,10 +85,6 @@
       "y": 0.5
     },
     "_id": ""
-  },
-  {
-    "__type__": "cc.CompPrefabInfo",
-    "fileId": "ac82PPqRBOyLIkgsr8d65K"
   },
   {
     "__type__": "cc.Sprite",
@@ -102,7 +96,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 5
+      "__id__": 4
     },
     "_visFlags": 0,
     "_customMaterial": null,
@@ -147,7 +141,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 7
+      "__id__": 6
     },
     "cardFace": null,
     "cardBack": {
@@ -169,7 +163,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 9
+      "__id__": 8
     },
     "_id": ""
   },
