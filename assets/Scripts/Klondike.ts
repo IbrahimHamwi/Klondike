@@ -30,7 +30,10 @@ export class Klondike extends Component {
     start() {
         Klondike.instance = this;
         this.bottoms = [this.bottom0, this.bottom1, this.bottom2, this.bottom3, this.bottom4, this.bottom5, this.bottom6];
-        this.PlayCards(); // call the function to play cards
+        this.bottomPos.reverse();
+        this.scheduleOnce(() => {
+            this.PlayCards(); // call the function to play cards
+        }, 0.3);
     }
 
     update(deltaTime: number) {
@@ -65,19 +68,27 @@ export class Klondike extends Component {
     }
     KlondikeDeal(): void {
         // deal the cards
+        let waitcounter = 0;
         for (let i = 0; i < 7; i++) {
             let yoffset = 0;// offset for the y position of the cards
             let zoffset = 0.03;// offset for the z position of the cards
             this.bottoms[i].forEach(card => {
-                let newCard = instantiate(this.card);
-                let xoffset = newCard.getComponent(UITransform).contentSize.width / 2
-                newCard.setRotation(math.quat(0, 0, 0, 1));
-                newCard.name = card;
-                newCard.getComponent(Selectable).faceup = true;
-                console.log("KlondikeDeal: " + card);
-                this.bottomPos[i].addChild(newCard);
-                newCard.setWorldPosition(this.bottomPos[i].worldPosition.x, this.bottomPos[i].worldPosition.y + yoffset, this.bottomPos[i].worldPosition.z - zoffset);
-                yoffset -= 30;
+                let counter = i;
+                this.scheduleOnce(() => {
+                    let newCard = instantiate(this.card);
+                    let xoffset = newCard.getComponent(UITransform).contentSize.width / 2
+                    newCard.setRotation(math.quat(0, 0, 0, 1));
+                    newCard.name = card;
+                    if (card == this.bottoms[counter][this.bottoms[counter].length - 1]) {
+
+                        newCard.getComponent(Selectable).faceup = true;
+                    }
+                    console.log("KlondikeDeal: " + card);
+                    this.bottomPos[counter].addChild(newCard);
+                    newCard.setWorldPosition(this.bottomPos[counter].worldPosition.x, this.bottomPos[counter].worldPosition.y + yoffset, this.bottomPos[counter].worldPosition.z - zoffset);
+                    yoffset -= 30;
+                }, waitcounter * 0.1);
+                waitcounter++;
             });
         }
     }
