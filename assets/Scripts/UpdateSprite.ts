@@ -18,13 +18,23 @@ export class UpdateSprite extends Component {
         let i = 0;
         for (let card of deck) {
             if (this.node.name == card) {
-                this.cardFace = klondike.cardFaces[i];
+                let suit = card.substring(0, 1);
+                let value = card.substring(1, card.length);
+                let suitIndex = Klondike.suits.indexOf(suit);
+                let valueIndex = Klondike.values.indexOf(value);
+                let cardFace = klondike.cardFaces[valueIndex * 4 + suitIndex];
+                this.cardFace = cardFace;
+                // this.cardFace = klondike.cardFaces[i];
                 break;
             }
             i++;
         }
         this.spriteRenderer = this.node.getComponent(Sprite);
         this.selectable = this.node.getComponent(Selectable);
+
+        this.node.on(Node.EventType.MOUSE_DOWN, function (event) { // on mouse down
+            console.log('Mouse down ' + this.node.name);
+        }, this);
     }
 
     update(deltaTime: number) {
