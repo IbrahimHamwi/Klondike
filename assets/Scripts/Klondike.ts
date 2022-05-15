@@ -125,7 +125,7 @@ export class Klondike extends Component {
         for (let i = 0; i < this.trips; i++) {
             let myTrips = [];
             for (let j = 0; j < 3; j++) {
-                myTrips.push(Klondike.deck[modifier]);
+                myTrips.push(Klondike.deck[j + modifier]);
             }
             this.deckTrips.push(myTrips);
             modifier += 3;
@@ -140,6 +140,7 @@ export class Klondike extends Component {
             this.deckTrips.push(myRemainders);
             this.trips += 1;
         }
+        console.log(this.deckTrips);
         this.deckLocation = 0;
     }
     DealFromDeck(): void {
@@ -158,20 +159,23 @@ export class Klondike extends Component {
             //draw 3 new cards
             console.log("draw 3 new cards");
             this.tripsOnDisplay = [];// clear the trips on display
-            let xoffset = 25;
+            let xoffset = 250;
             let zoffset = 3;
             this.deckTrips[this.deckLocation].forEach(card => {
                 console.log("card: " + card);
                 let newTopCard: Node = instantiate(this.card); // instantiate a new card
                 this.deckButton.addChild(newTopCard); // add the card to the deck button
-                newTopCard.setWorldPosition(this.deckButton.worldPosition.x + xoffset, this.deckButton.worldPosition.y, this.deckButton.worldPosition.z + zoffset); // set the position of the card
+                newTopCard.setWorldPosition(
+                    this.deckButton.worldPosition.x + xoffset,
+                    this.deckButton.worldPosition.y,
+                    this.deckButton.worldPosition.z + zoffset); // set the position of the card
                 newTopCard.setRotation(math.quat(0, 0, 0, 1));
                 xoffset += 25;
                 zoffset += 3;
                 newTopCard.name = card;
                 this.tripsOnDisplay.push(card);
                 newTopCard.getComponent(Selectable).faceup = true;
-            })
+            });
             this.deckLocation++;
         }
         else {
