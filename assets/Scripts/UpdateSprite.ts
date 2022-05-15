@@ -13,7 +13,7 @@ export class UpdateSprite extends Component {
 
     start() {
         let deck: string[] = Klondike.GenerateDeck();
-        let klondike: Klondike = this.node.parent.getComponent(Klondike);
+        let klondike: Klondike = Klondike.instance;
 
         let i = 0;
         for (let card of deck) {

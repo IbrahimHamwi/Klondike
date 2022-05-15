@@ -1,9 +1,10 @@
-import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform } from 'cc';
 import { Selectable } from './Selectable';
 const { ccclass, property } = _decorator;
 
 @ccclass('Klondike')
 export class Klondike extends Component {
+    static instance: Klondike;
 
     // sprite array for card faces
     @property({ type: SpriteFrame }) cardFaces: SpriteFrame[] = [];
@@ -27,9 +28,9 @@ export class Klondike extends Component {
     private bottom6: string[] = [];
 
     start() {
-        this.PlayCards(); // call the function to play cards
+        Klondike.instance = this;
         this.bottoms = [this.bottom0, this.bottom1, this.bottom2, this.bottom3, this.bottom4, this.bottom5, this.bottom6];
-
+        this.PlayCards(); // call the function to play cards
     }
 
     update(deltaTime: number) {
@@ -39,10 +40,7 @@ export class Klondike extends Component {
     PlayCards(): void {
         Klondike.deck = Klondike.GenerateDeck(); // generate the deck
         Klondike.deck = Klondike.ShuffleDeck(Klondike.deck);// shuffle the deck
-        Klondike.deck.forEach(card => {
-            // console.log(card);
-        }
-        );
+        this.KlondikeSort(); // sort the cards
         this.KlondikeDeal(); // deal the cards
     }
 
@@ -67,19 +65,29 @@ export class Klondike extends Component {
     }
     KlondikeDeal(): void {
         // deal the cards
-        let yoffset = 0;// offset for the y position of the cards
-        let zoffset = 0.03;// offset for the z position of the cards
-        Klondike.deck.forEach(card => {
-            let newCard = instantiate(this.card);
-            newCard.setRotation(math.quat(0, 0, 0, 1));
-            newCard.setPosition(0, yoffset, zoffset);
-            newCard.name = card;
-            newCard.getComponent(Selectable).faceup = true;
-            console.log("KlondikeDeal: " + card);
-            this.node.addChild(newCard);
-            yoffset -= 30;
-
-        });
+        for (let i = 0; i < 7; i++) {
+            let yoffset = 0;// offset for the y position of the cards
+            let zoffset = 0.03;// offset for the z position of the cards
+            this.bottoms[i].forEach(card => {
+                let newCard = instantiate(this.card);
+                let xoffset = newCard.getComponent(UITransform).contentSize.width / 2
+                newCard.setRotation(math.quat(0, 0, 0, 1));
+                newCard.setPosition(this.bottomPos[i].worldPosition.x, this.bottomPos[i].position.y + yoffset, this.bottomPos[i].position.z - zoffset);
+                newCard.name = card;
+                newCard.getComponent(Selectable).faceup = true;
+                console.log("KlondikeDeal: " + card);
+                this.bottomPos[i].addChild(newCard);
+                yoffset -= 30;
+            });
+        }
+    }
+    KlondikeSort(): void {
+        // sort the cards
+        for (let i = 0; i < 7; i++) {
+            for (let j = i; j < 7; j++) {
+                this.bottoms[j].push(Klondike.deck.pop());
+            }
+        }
     }
 }
 
