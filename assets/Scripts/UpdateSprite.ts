@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, SpriteFrame, Sprite } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Sprite, Color } from 'cc';
 import { Klondike } from './Klondike';
 import { Selectable } from './Selectable';
 const { ccclass, property } = _decorator;
@@ -33,7 +33,9 @@ export class UpdateSprite extends Component {
         this.selectable = this.node.getComponent(Selectable);
 
         this.node.on(Node.EventType.MOUSE_DOWN, function (event) { // on mouse down
-            console.log('Mouse down ' + this.node.name);
+            // click card options
+            // console.log('Mouse down ' + this.node.name);
+            Klondike.instance.Card(this.node);
         }, this);
     }
 
@@ -43,6 +45,16 @@ export class UpdateSprite extends Component {
         }
         else {
             this.spriteRenderer.spriteFrame = this.cardBack;
+        }
+        if (Klondike.instance.slot1) {
+
+            if (this.node.name == Klondike.instance.slot1.name) {
+                this.spriteRenderer.color = Color.YELLOW;
+            } else {
+                this.spriteRenderer.color = Color.WHITE;
+            }
+        } else {
+            this.spriteRenderer.color = Color.WHITE;
         }
     }
 }

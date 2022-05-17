@@ -13,6 +13,7 @@ export class Klondike extends Component {
     @property({ type: Node }) deckButton: Node = null;
     @property({ type: Node }) topPos: Node[] = [];
     @property({ type: Node }) bottomPos: Node[] = [];
+    @property({ type: Node }) slot1: Node = null;
 
     public static deck: string[] = [];
     public discardPile: string[] = [];
@@ -37,6 +38,7 @@ export class Klondike extends Component {
 
     start() {
         Klondike.instance = this;
+        this.slot1 = this.node;
         this.bottoms = [this.bottom0, this.bottom1, this.bottom2, this.bottom3, this.bottom4, this.bottom5, this.bottom6];
         this.bottomPos.reverse();
         this.scheduleOnce(() => {
@@ -88,6 +90,7 @@ export class Klondike extends Component {
                     let xoffset = newCard.getComponent(UITransform).contentSize.width / 2
                     newCard.setRotation(math.quat(0, 0, 0, 1));
                     newCard.name = card;
+                    newCard.getComponent(Selectable).row = i;
                     if (card == this.bottoms[counter][this.bottoms[counter].length - 1]) {
 
                         newCard.getComponent(Selectable).faceup = true;
@@ -159,7 +162,7 @@ export class Klondike extends Component {
             //draw 3 new cards
             console.log("draw 3 new cards");
             this.tripsOnDisplay = [];// clear the trips on display
-            let xoffset = 250;
+            let xoffset = 130;
             let zoffset = 3;
             this.deckTrips[this.deckLocation].forEach(card => {
                 console.log("card: " + card);
@@ -175,6 +178,7 @@ export class Klondike extends Component {
                 newTopCard.name = card;
                 this.tripsOnDisplay.push(card);
                 newTopCard.getComponent(Selectable).faceup = true;
+                newTopCard.getComponent(Selectable).inDeckPile = true;
             });
             this.deckLocation++;
         }
@@ -190,6 +194,82 @@ export class Klondike extends Component {
         })
         this.discardPile = [];
         this.SortDeckIntoTrips();
+    }
+    Card(selected: Node): void {
+        console.log("Card " + selected.name);
+        let comp = selected.getComponent(UpdateSprite);
+        if (this.slot1 == this.node) {
+            this.slot1 = selected;
+        }
+
+        //if the card clicked on is facedown
+        //if the the card clicked on is not blocked
+        // flip it over
+
+        //if the card clicked on is in the deck pile with the trips
+        // if it is not blocked
+        // select it
+
+        // if the card is face up
+        // if there is no currently selected card
+        // select it
+
+        //  if there is already a card selected(and it is not the same card)
+        else if (this.slot1 != selected) {// if the new card is eligible to stack on the old card
+            if (this.Stackable(selected)) {
+                this.slot1 = selected; // stack the cards
+            } else {
+                // select the new card
+                this.slot1 = selected;
+            }
+        }
+
+
+        // else if there is already a card selected and it is the same card
+        // if the time is short enough the it is a double click
+        // if the card is eligible to fly up top then do it
+    }
+    Stackable(selected: Node): boolean {
+        let s1: Selectable = this.slot1.getComponent(Selectable);
+        let s2: Selectable = selected.getComponent(Selectable);
+        //compare them to see if the stack
+
+        //if in the top pile must stack suited Ace to King
+        if (s2.top) {
+            if (s1.suit == s2.suit || (s1.value == 1 && s2.value == null)) {
+                if (s1.value == s2.value - 1) {
+                    if (s1.value == s2.value + 1) {
+                        return true;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+        else {//if in the bottom pile must stack alternate colors king to ace
+            if (s1.value == s2.value - 1) {
+                let card1Red = true;
+                let card2Red = true;
+                if (s1.suit == "C" || s1.suit == "S") {
+                    card1Red = false;
+                }
+                if (s2.suit == "C" || s2.suit == "S") {
+                    card2Red = false;
+                }
+                if (card1Red == card2Red) {
+                    return true;
+                }
+                else {
+                    console.log("Stackable");
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+    Stack(selected: Node): void {
+
     }
 }
 
