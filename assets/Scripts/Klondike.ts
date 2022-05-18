@@ -196,9 +196,10 @@ export class Klondike extends Component {
         this.SortDeckIntoTrips();
     }
     Card(selected: Node): void {
-        console.log("Card " + selected.name);
+        console.log("Clicked on card" + selected.name);
         let comp = selected.getComponent(UpdateSprite);
         if (this.slot1 == this.node) {
+            console.log("slot1 is empty");
             this.slot1 = selected;
         }
 
@@ -215,15 +216,21 @@ export class Klondike extends Component {
         // select it
 
         //  if there is already a card selected(and it is not the same card)
-        else if (this.slot1 != selected) {// if the new card is eligible to stack on the old card
+        else if (this.slot1 != selected) {
+            console.log("slot1 is not empty");
+            // if the new card is eligible to stack on the old card
             if (this.Stackable(selected)) {
-                this.slot1 = selected; // stack the cards
+                // stack the cards
+                this.Stack(selected);
+                console.log("cards stacked");
+
             } else {
                 // select the new card
                 this.slot1 = selected;
+                console.log("selecting new card " + selected.name);
             }
         }
-
+        else { console.log("card is already selected"); }
 
         // else if there is already a card selected and it is the same card
         // if the time is short enough the it is a double click
@@ -233,44 +240,93 @@ export class Klondike extends Component {
         let s1: Selectable = this.slot1.getComponent(Selectable);
         let s2: Selectable = selected.getComponent(Selectable);
         //compare them to see if the stack
+        console.log("s1.value: " + s1.value + " s2.value: " + s2.value);
 
         //if in the top pile must stack suited Ace to King
         if (s2.top) {
+            console.log("s2 is top");
             if (s1.suit == s2.suit || (s1.value == 1 && s2.value == null)) {
-                if (s1.value == s2.value - 1) {
-                    if (s1.value == s2.value + 1) {
-                        return true;
-                    }
-                }
-                else {
-                    return false;
+                console.log("s1 and s2 are suited or s1 is Ace and s2 is null");
+                if (s1.value == s2.value + 1) {
+                    console.log("s1 and s2 are one value apart");
+                    return true;
+                    console.log("stackable");
                 }
             }
+            else {
+                console.log("s1 and s2 are not suited or s1 is Ace and s2 is null");
+                    return false;
+            }
         }
-        else {//if in the bottom pile must stack alternate colors king to ace
+        else {
+            console.log("s2 is not top");
+            //if in the bottom pile must stack alternate colors king to ace
             if (s1.value == s2.value - 1) {
+                console.log("s1 and s2 are one value apart");
                 let card1Red = true;
                 let card2Red = true;
                 if (s1.suit == "C" || s1.suit == "S") {
+                    console.log("s1 is red");
                     card1Red = false;
                 }
                 if (s2.suit == "C" || s2.suit == "S") {
+                    console.log("s2 is red");
                     card2Red = false;
                 }
                 if (card1Red == card2Red) {
-                    return true;
+                    console.log("not stackable");
+                    return false;
                 }
                 else {
                     console.log("Stackable");
-                    return false;
+                    return true;
                 }
+            } else {
+                console.log("s1 and s2 are not one value apart");
             }
         }
         return false;
     }
     Stack(selected: Node): void {
+        //if on top king or empty bottom stack cards in plance
+        //else stack the cards with a negative y offset
+        console.log("stacking cards");
+        let s1: Selectable = this.slot1.getComponent(Selectable);
+        let s2: Selectable = selected.getComponent(Selectable);
+        let yoffset = -30
 
+        if (s2.top || (!s2.top && s1.value == 13)) {
+            yoffset = 0;
+        }
+        // this.slot1.removeFromParent();
+        // this.slot1.addChild(selected);//this makes the children move with the parents
+        this.slot1.setWorldPosition(selected.worldPosition.x, selected.worldPosition.y + yoffset, selected.worldPosition.z - 10);
+        if (s1.inDeckPile) { // remove the cards from the top pile to prevent duplicate cards
+            this.tripsOnDisplay.splice(this.tripsOnDisplay.indexOf(this.slot1.name), 1);
+        }
+        else if (s1.top && s2.top && s1.value == 1) { //allow movement of cards between top spots
+            this.topPos[s1.row].getComponent(Selectable).value = 0;
+            this.topPos[s1.row].getComponent(Selectable).suit = null;
+        } else if (s1.top) { // keep track of the current value of the top decks as a card has been removed
+            this.topPos[s1.row].getComponent(Selectable).value = s1.value - 1;
+        } else { // removes the card string from the appropriate bottom pile
+            this.bottoms[s1.row].splice(this.bottoms[s1.row].indexOf(this.slot1.name), 1);
+        }
+        s1.inDeckPile = false;//you cannot adds to the trips pile so this is always fine
+        s1.row = s2.row;
+
+        if (s2.top) { //moves a card to the top of the pile and assigns the top's value and suit
+            this.topPos[s1.row].getComponent(Selectable).value = s1.value;
+            this.topPos[s1.row].getComponent(Selectable).suit = s1.suit;
+            s1.top = true;
+        }
+        else {
+            s2.top = false;
+        }
+        //after completing move reset slot1 to be essentially null as being null will break the logic
+        this.slot1 = this.node;
     }
+
 }
 
 

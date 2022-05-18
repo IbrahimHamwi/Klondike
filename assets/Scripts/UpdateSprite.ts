@@ -34,7 +34,7 @@ export class UpdateSprite extends Component {
 
         this.node.on(Node.EventType.MOUSE_DOWN, function (event) { // on mouse down
             // click card options
-            // console.log('Mouse down ' + this.node.name);
+            console.log('Mouse down ' + this.node.name);
             Klondike.instance.Card(this.node);
         }, this);
     }
@@ -53,8 +53,6 @@ export class UpdateSprite extends Component {
             } else {
                 this.spriteRenderer.color = Color.WHITE;
             }
-        } else {
-            this.spriteRenderer.color = Color.WHITE;
         }
     }
 }
