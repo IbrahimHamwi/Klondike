@@ -14,6 +14,7 @@ export class Klondike extends Component {
     @property({ type: Node }) topPos: Node[] = [];
     @property({ type: Node }) bottomPos: Node[] = [];
     @property({ type: Node }) slot1: Node = null;
+    @property({ type: Node }) DeckPile: Node = null;
 
     public static deck: string[] = [];
     public discardPile: string[] = [];
@@ -149,7 +150,7 @@ export class Klondike extends Component {
     DealFromDeck(): void {
         console.log("DealFromDeck");
         // add remaining cards to the discard pile
-        this.deckButton.children.forEach(child => {
+        this.DeckPile.children.forEach(child => {
             if (child.getComponent(UpdateSprite)) {
                 Klondike.deck.splice(Klondike.deck.indexOf(child.name), 1);
                 this.discardPile.push(child.name);
@@ -167,7 +168,7 @@ export class Klondike extends Component {
             this.deckTrips[this.deckLocation].forEach(card => {
                 console.log("card: " + card);
                 let newTopCard: Node = instantiate(this.card); // instantiate a new card
-                this.deckButton.addChild(newTopCard); // add the card to the deck button
+                this.DeckPile.addChild(newTopCard); // add the card to the deck button
                 newTopCard.setWorldPosition(
                     this.deckButton.worldPosition.x + xoffset,
                     this.deckButton.worldPosition.y,
@@ -195,21 +196,54 @@ export class Klondike extends Component {
         this.discardPile = [];
         this.SortDeckIntoTrips();
     }
+
+    Top(selected: Node): void { // top click actions
+        console.log("clicked on top");
+        if (this.slot1.getComponent(UpdateSprite)) {
+            //if the card is an ace and the empty slot is top the stack
+            if (this.slot1.getComponent(Selectable).value == 1) {
+                console.log("ace in slot 1");
+                this.Stack(selected);// stack the card
+            }
+
+        }
+    }
+    Bottom(selected: Node): void {
+        console.log("clicked on bottom");
+        if (this.slot1.getComponent(UpdateSprite)) {
+            //if the card is a king and the empty slot is bottom the stack
+            if (this.slot1.getComponent(Selectable).value == 13) {
+                console.log("king in slot 1");
+                this.Stack(selected);// stack the card
+            }
+        }
+    }
+
     Card(selected: Node): void {
+        if (!this.slot1) {
+            this.slot1 = this.node;
+        }
         console.log("Clicked on card" + selected.name);
-        let comp = selected.getComponent(UpdateSprite);
         if (this.slot1 == this.node) {
             console.log("slot1 is empty");
             this.slot1 = selected;
         }
 
-        //if the card clicked on is facedown
-        //if the the card clicked on is not blocked
-        // flip it over
-
-        //if the card clicked on is in the deck pile with the trips
-        // if it is not blocked
-        // select it
+        if (!selected.getComponent(Selectable).faceup) {//if the card clicked on is facedown
+            console.log("card is facedown");
+            if (!this.Blocked(selected)) {//if the the card clicked on is not blocked
+                console.log("card is not blocked");
+                // flip it over
+                selected.getComponent(Selectable).faceup = true;
+                this.slot1 = this.node;
+            }
+        }
+        else if (selected.getComponent(Selectable).inDeckPile) { // if the card clicked on is in the deck pile with the trips
+            if (!this.Blocked(selected)) { // if it is not blocked
+                console.log("card is not blocked");
+                this.slot1 = selected;// select it
+            }
+        }
 
         // if the card is face up
         // if there is no currently selected card
@@ -242,47 +276,48 @@ export class Klondike extends Component {
         //compare them to see if the stack
         console.log("s1.value: " + s1.value + " s2.value: " + s2.value);
 
-        //if in the top pile must stack suited Ace to King
-        if (s2.top) {
-            console.log("s2 is top");
-            if (s1.suit == s2.suit || (s1.value == 1 && s2.value == null)) {
-                console.log("s1 and s2 are suited or s1 is Ace and s2 is null");
-                if (s1.value == s2.value + 1) {
-                    console.log("s1 and s2 are one value apart");
-                    return true;
-                    console.log("stackable");
+        if (!s2.inDeckPile) {
+            if (s2.top) {//if in the top pile must stack suited Ace to King
+                console.log("s2 is top");
+                if (s1.suit == s2.suit || (s1.value == 1 && s2.value == null)) {
+                    console.log("s1 and s2 are suited or s1 is Ace and s2 is null");
+                    if (s1.value == s2.value + 1) {
+                        console.log("s1 and s2 are one value apart");
+                        return true;
+                        console.log("stackable");
+                    }
+                }
+                else {
+                    console.log("s1 and s2 are not suited or s1 is Ace and s2 is null");
+                    return false;
                 }
             }
             else {
-                console.log("s1 and s2 are not suited or s1 is Ace and s2 is null");
-                    return false;
-            }
-        }
-        else {
-            console.log("s2 is not top");
-            //if in the bottom pile must stack alternate colors king to ace
-            if (s1.value == s2.value - 1) {
-                console.log("s1 and s2 are one value apart");
-                let card1Red = true;
-                let card2Red = true;
-                if (s1.suit == "C" || s1.suit == "S") {
-                    console.log("s1 is red");
-                    card1Red = false;
+                console.log("s2 is not top");
+                //if in the bottom pile must stack alternate colors king to ace
+                if (s1.value == s2.value - 1) {
+                    console.log("s1 and s2 are one value apart");
+                    let card1Red = true;
+                    let card2Red = true;
+                    if (s1.suit == "C" || s1.suit == "S") {
+                        console.log("s1 is red");
+                        card1Red = false;
+                    }
+                    if (s2.suit == "C" || s2.suit == "S") {
+                        console.log("s2 is red");
+                        card2Red = false;
+                    }
+                    if (card1Red == card2Red) {
+                        console.log("not stackable");
+                        return false;
+                    }
+                    else {
+                        console.log("Stackable");
+                        return true;
+                    }
+                } else {
+                    console.log("s1 and s2 are not one value apart");
                 }
-                if (s2.suit == "C" || s2.suit == "S") {
-                    console.log("s2 is red");
-                    card2Red = false;
-                }
-                if (card1Red == card2Red) {
-                    console.log("not stackable");
-                    return false;
-                }
-                else {
-                    console.log("Stackable");
-                    return true;
-                }
-            } else {
-                console.log("s1 and s2 are not one value apart");
             }
         }
         return false;
@@ -300,7 +335,7 @@ export class Klondike extends Component {
         }
         // this.slot1.removeFromParent();
         // this.slot1.addChild(selected);//this makes the children move with the parents
-        this.slot1.setWorldPosition(selected.worldPosition.x, selected.worldPosition.y + yoffset, selected.worldPosition.z - 10);
+        this.slot1.setWorldPosition(selected.worldPosition.x, selected.worldPosition.y + yoffset, selected.worldPosition.z + 10);
         if (s1.inDeckPile) { // remove the cards from the top pile to prevent duplicate cards
             this.tripsOnDisplay.splice(this.tripsOnDisplay.indexOf(this.slot1.name), 1);
         }
@@ -326,7 +361,32 @@ export class Klondike extends Component {
         //after completing move reset slot1 to be essentially null as being null will break the logic
         this.slot1 = this.node;
     }
-
+    Blocked(selected: Node): boolean {
+        let s2: Selectable = selected.getComponent(Selectable);
+        if (s2.inDeckPile == true) { //if the card is in the deck pile
+            console.log("card is in the deck pile");
+            if (s2.node.name == this.tripsOnDisplay[this.tripsOnDisplay.length - 1]) { //if the card is the last card in the deck pile
+                console.log("the selected card " + s2.node.name + " is the last card in the deck pile");
+                return false;
+            }
+            else {
+                console.log(s2.node.name + " is blocked by" + this.tripsOnDisplay[this.tripsOnDisplay.length - 1]);
+                return true;
+            }
+        }
+        else {
+            console.log("the selected card " + s2.node.name + " is not in the deck pile");
+            if (s2.node.name == this.bottoms[s2.row][this.bottoms[s2.row].length - 1]) { //check if is the bottom card
+                console.log("the selected card row is " + s2.row);
+                console.log(s2.node.name + " is the bottom card");
+                return false;
+            } else {
+                console.log("the last card in the bottom pile is " + this.bottoms[s2.row][this.bottoms[s2.row].length - 1]);
+                console.log(s2.node.name + " is not the bottom card");
+                return true;
+            }
+        }
+    }
 }
 
 

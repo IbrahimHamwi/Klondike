@@ -5,10 +5,10 @@ const { ccclass, property } = _decorator;
 @ccclass('Selectable')
 export class Selectable extends Component {
 
-    top: boolean = false;
+    @property({ type: Boolean }) top: boolean = false;
+    @property({ type: Number }) row: number = 0;
     suit: string;
     value: number;
-    row: number;
     faceup: boolean = false;
     inDeckPile: boolean = false;
 
