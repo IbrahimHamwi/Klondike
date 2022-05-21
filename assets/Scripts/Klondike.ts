@@ -1,5 +1,6 @@
 import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find } from 'cc';
 import { Selectable } from './Selectable';
+import { TopScript } from './TopScript';
 import { UpdateSprite } from './UpdateSprite';
 const { ccclass, property } = _decorator;
 
@@ -16,7 +17,7 @@ export class Klondike extends Component {
     @property({ type: Node }) slot1: Node = null;
     @property({ type: Node }) DeckPile: Node = null;
 
-    public static deck: string[] = [];
+    public deck: string[] = [];
     public discardPile: string[] = [];
     private trips: number;
     private tripsRemainder: number;
@@ -32,22 +33,39 @@ export class Klondike extends Component {
     public tripsOnDisplay: string[] = [];
     public deckTrips: string[][] = [];
 
-    private bottom0: string[] = [];
-    private bottom1: string[] = [];
-    private bottom2: string[] = [];
-    private bottom3: string[] = [];
-    private bottom4: string[] = [];
-    private bottom5: string[] = [];
-    private bottom6: string[] = [];
-
     start() {
         Klondike.instance = this;
         this.slot1 = this.node;
-        this.bottoms = [this.bottom0, this.bottom1, this.bottom2, this.bottom3, this.bottom4, this.bottom5, this.bottom6];
+        this.bottoms = [[], [], [], [], [], [], []];
         this.bottomPos.reverse();
         this.scheduleOnce(() => {
             this.PlayCards(); // call the function to play cards
         }, 0.3);
+    }
+
+    ResetScene(): void {
+        //find all cards and remove them
+        this.unscheduleAllCallbacks();
+        let cards = this.node.parent.getComponentsInChildren(UpdateSprite);
+        for (let i = 0; i < cards.length; i++) {
+            cards[i].node.active = false;
+            cards[i].node.destroy();
+        }
+        //clear the top values
+        this.ClearTopValues();
+        this.bottoms = [[], [], [], [], [], [], []];
+
+        //deal new cards
+        this.PlayCards();
+    }
+    ClearTopValues(): void {
+        let tops = this.node.parent.getComponentsInChildren(TopScript);
+        for (let i = 0; i < tops.length; i++) {
+            let selectable = tops[i].node.getComponent(Selectable);
+            selectable.value = 0;
+            selectable.suit = "";
+        }
+
     }
 
     update(deltaTime: number) {
@@ -73,8 +91,9 @@ export class Klondike extends Component {
     }
 
     PlayCards(): void {
-        Klondike.deck = Klondike.GenerateDeck(); // generate the deck
-        Klondike.deck = Klondike.ShuffleDeck(Klondike.deck);// shuffle the deck
+        Klondike.instance.deck = Klondike.GenerateDeck(); // generate the deck
+        Klondike.instance.deck = Klondike.ShuffleDeck(Klondike.instance.deck);// shuffle the deck
+        console.log("size of deck: " + Klondike.instance.deck.length);
         this.KlondikeSort(); // sort the cards
         this.KlondikeDeal(); // deal the cards
         this.SortDeckIntoTrips(); // sort the cards into trips
@@ -91,13 +110,13 @@ export class Klondike extends Component {
         return deck;
     }
     static GenerateDeck(): string[] {
-        Klondike.deck = [];
+        let deck = [];
         for (let suit of Klondike.suits) {
             for (let value of Klondike.values) {
-                Klondike.deck.push(suit + value);
+                deck.push(suit + value);
             }
         }
-        return Klondike.deck;
+        return deck;
     }
     KlondikeDeal(): void {
         // deal the cards
@@ -127,8 +146,8 @@ export class Klondike extends Component {
             });
         }
         this.discardPile.forEach(card => {
-            if (Klondike.deck.indexOf(card) != -1) {
-                Klondike.deck.splice(Klondike.deck.indexOf(card), 1);
+            if (Klondike.instance.deck.indexOf(card) != -1) {
+                Klondike.instance.deck.splice(Klondike.instance.deck.indexOf(card), 1);
             }
         })
         this.discardPile = [];
@@ -137,20 +156,20 @@ export class Klondike extends Component {
         // sort the cards
         for (let i = 0; i < 7; i++) {
             for (let j = i; j < 7; j++) {
-                this.bottoms[j].push(Klondike.deck.pop());
+                this.bottoms[j].push(Klondike.instance.deck.pop());
             }
         }
     }
     SortDeckIntoTrips(): void {
-        this.trips = Klondike.deck.length / 3;
-        this.tripsRemainder = Klondike.deck.length % 3;
+        this.trips = Klondike.instance.deck.length / 3;
+        this.tripsRemainder = Klondike.instance.deck.length % 3;
         this.deckTrips = [];
 
         let modifier = 0;
         for (let i = 0; i < this.trips; i++) {
             let myTrips = [];
             for (let j = 0; j < 3; j++) {
-                myTrips.push(Klondike.deck[j + modifier]);
+                myTrips.push(Klondike.instance.deck[j + modifier]);
             }
             this.deckTrips.push(myTrips);
             modifier += 3;
@@ -159,7 +178,7 @@ export class Klondike extends Component {
             let myRemainders = [];
             modifier = 0;
             for (let k = 0; k < this.tripsRemainder; k++) {
-                myRemainders.push(Klondike.deck[Klondike.deck.length - this.tripsRemainder + modifier]);
+                myRemainders.push(Klondike.instance.deck[Klondike.instance.deck.length - this.tripsRemainder + modifier]);
                 modifier++;
             }
             this.deckTrips.push(myRemainders);
@@ -173,7 +192,7 @@ export class Klondike extends Component {
         // add remaining cards to the discard pile
         this.DeckPile.children.forEach(child => {
             if (child.getComponent(UpdateSprite)) {
-                Klondike.deck.splice(Klondike.deck.indexOf(child.name), 1);
+                Klondike.instance.deck.splice(Klondike.instance.deck.indexOf(child.name), 1);
                 this.discardPile.push(child.name);
                 child.destroy();
             }
@@ -210,9 +229,9 @@ export class Klondike extends Component {
         }
     }
     RestackTopDeck(): void {
-        Klondike.deck == [];// clear the deck
+        Klondike.instance.deck == [];// clear the deck
         this.discardPile.forEach(card => {
-            Klondike.deck.push(card);
+            Klondike.instance.deck.push(card);
         })
         this.discardPile = [];
         this.SortDeckIntoTrips();
@@ -492,14 +511,7 @@ export class Klondike extends Component {
             return false;
         }
     }
-    ResetScene(): void {
-        //find all cards and remove them
-        //clear the top values
-        //deal new cards
-    }
-    ClearTopValues(): void {
 
-    }
 }
 
     // FindNodeWithName(name: string): Node {
