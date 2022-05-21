@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find } from 'cc';
 import { Selectable } from './Selectable';
 import { UpdateSprite } from './UpdateSprite';
 const { ccclass, property } = _decorator;
@@ -21,6 +21,9 @@ export class Klondike extends Component {
     private trips: number;
     private tripsRemainder: number;
     private deckLocation: number;
+    private timer: number = 0;
+    private doubleClickTimer: number = 1;
+    private clickCount: number = 0;
 
     public static suits: string[] = ["C", "D", "H", "S"];
     public static values: string[] = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "A", "J", "K", "Q",];
@@ -48,6 +51,24 @@ export class Klondike extends Component {
     }
 
     update(deltaTime: number) {
+        if (this.clickCount == 1) {
+            console.log("click count is 1");
+            this.timer += deltaTime;
+        }
+        if (this.clickCount == 3) {
+            console.log("click count is 3");
+            this.timer = 0;
+            this.clickCount = 1;
+        }
+        if (this.timer > this.doubleClickTimer) {
+            console.log("greater than double click timer");
+            this.clickCount = 0;
+            this.timer = 0;
+        }
+        if (this.clickCount == 2) {
+            console.log("click count is 2");
+
+        }
 
     }
 
@@ -185,11 +206,11 @@ export class Klondike extends Component {
         }
         else {
             console.log("no more cards to draw");
-            //restack the top deck
-
+            this.RestackTopDeck();//restack the top deck
         }
     }
     RestackTopDeck(): void {
+        Klondike.deck == [];// clear the deck
         this.discardPile.forEach(card => {
             Klondike.deck.push(card);
         })
@@ -241,7 +262,16 @@ export class Klondike extends Component {
         else if (selected.getComponent(Selectable).inDeckPile) { // if the card clicked on is in the deck pile with the trips
             if (!this.Blocked(selected)) { // if it is not blocked
                 console.log("card is not blocked");
-                this.slot1 = selected;// select it
+                if (this.slot1 == selected) {
+                    console.log("card is clicked on twice");
+                    if (this.DoubleClick()) {
+                        console.log("double click");
+                        this.AutoStack(selected);//attempt autostack
+                    }
+                }
+                else {
+                    this.slot1 = selected;// select it
+                }
             }
         }
 
@@ -264,11 +294,14 @@ export class Klondike extends Component {
                 console.log("selecting new card " + selected.name);
             }
         }
-        else { console.log("card is already selected"); }
-
-        // else if there is already a card selected and it is the same card
-        // if the time is short enough the it is a double click
         // if the card is eligible to fly up top then do it
+        else if (this.slot1 == selected) {// else if there is already a card selected and it is the same card
+            if (this.DoubleClick()) {// if the time is short enough the it is a double click
+                //attempt autostack
+                this.AutoStack(selected);
+            }
+        }
+
     }
     Stackable(selected: Node): boolean {
         let s1: Selectable = this.slot1.getComponent(Selectable);
@@ -387,7 +420,102 @@ export class Klondike extends Component {
             }
         }
     }
+    ResetClick(): void {
+        console.log("reset click");
+        this.clickCount++;
+    }
+    DoubleClick(): boolean {
+        if (this.timer < this.doubleClickTimer && this.clickCount == 2) {
+            console.log("double click");
+            return true;
+        } else {
+
+            console.log("single click");
+            console.log("click count is " + this.clickCount);
+            console.log("timer is " + this.timer + " and double click timer is " + this.doubleClickTimer);
+            return false;
+        }
+    }
+    AutoStack(selected: Node): void {
+        console.log("autostacking cards");
+        for (let i = 0; i < this.topPos.length; i++) {
+            console.log("checking top " + i);
+            let stack: Selectable = this.topPos[i].getComponent(Selectable);
+            if (selected.getComponent(Selectable).value == 1) { //if the card is an ace
+                console.log("selected card is an ace");
+                if (this.topPos[i].getComponent(Selectable).value == 0) { // and the top position is empty
+                    console.log("top position is empty");
+                    this.slot1 = selected;
+                    this.Stack(stack.node);// stack the ace on top
+                    break;                  // in the first empty position found
+                } else {
+                    console.log("top position is not empty");
+                    console.log("top position value is " + this.topPos[i].getComponent(Selectable).value);
+                }
+            }
+            else if (this.topPos[i].getComponent(Selectable).suit == this.slot1.getComponent(Selectable).suit && this.topPos[i].getComponent(Selectable).value == this.slot1.getComponent(Selectable).value - 1) {
+                console.log("selected card is one value away from the top card");
+                if (this.HasNoChildren(this.slot1)) { //if it is the last card (if it has no children)
+                    this.slot1 = selected;
+                    // find a top spot that matches the conditions for auto stacking if it exists
+                    let lastCardName: string = stack.suit + stack.value.toString();
+                    if (stack.value == 1) {
+                        lastCardName = stack.suit + "A";
+                    }
+                    if (stack.value == 11) {
+                        lastCardName = stack.suit + "J";
+                    }
+                    if (stack.value == 12) {
+                        lastCardName = stack.suit + "Q";
+                    }
+                    if (stack.value == 13) {
+                        lastCardName = stack.suit + "K";
+                    }
+                    let lastCard = Klondike.instance.node.parent.getChildByName(lastCardName);
+                    console.log("last card is " + lastCard.name);
+                    this.Stack(lastCard);
+                    break;
+                } else {
+                    console.log("selected card is not the last card");
+                }
+            } else {
+                console.log("no conditions met");
+            }
+        }
+    }
+    HasNoChildren(card: Node): boolean {
+        let children: Node[] = card.children;
+        if (children.length == 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    ResetScene(): void {
+        //find all cards and remove them
+        //clear the top values
+        //deal new cards
+    }
+    ClearTopValues(): void {
+
+    }
 }
+
+    // FindNodeWithName(name: string): Node {
+    //     for (let i = 0; i < this.topPos.length; i++) {
+    //         let stack: Node = this.topPos[i];
+    //         if (stack.name == name) {
+    //             return stack;
+    //         }
+    //     for (let i = 0; i < this.bottoms.length; i++) {
+    //         let stack: Node = this.bottoms[i][this.bottoms[i].length - 1];
+    //         if (stack.name == name) {
+    //             return stack;
+    //         }
+    //     }
+    // }
+
 
 
 

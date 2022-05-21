@@ -36,6 +36,7 @@ export class UpdateSprite extends Component {
             // click card options
             console.log('Mouse down ' + this.node.name);
             Klondike.instance.Card(this.node);
+            Klondike.instance.ResetClick();
         }, this);
     }
 

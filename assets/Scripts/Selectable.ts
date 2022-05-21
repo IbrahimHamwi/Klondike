@@ -8,7 +8,7 @@ export class Selectable extends Component {
     @property({ type: Boolean }) top: boolean = false;
     @property({ type: Number }) row: number = 0;
     suit: string;
-    value: number;
+    value: number = 0;
     faceup: boolean = false;
     inDeckPile: boolean = false;
 
