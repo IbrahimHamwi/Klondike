@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find, CCObject } from 'cc';
 import { Selectable } from './Selectable';
 import { TopScript } from './TopScript';
 import { UpdateSprite } from './UpdateSprite';
@@ -19,9 +19,9 @@ export class Klondike extends Component {
 
     public deck: string[] = [];
     public discardPile: string[] = [];
-    private trips: number;
-    private tripsRemainder: number;
-    private deckLocation: number;
+    private trips: number = 0;
+    private tripsRemainder: number = 0;
+    private deckLocation: number = 0; //track where I am within the deck
     private timer: number = 0;
     private doubleClickTimer: number = 1;
     private clickCount: number = 0;
@@ -31,7 +31,7 @@ export class Klondike extends Component {
     public bottoms: string[][] = [];
     public tops: string[][] = [];
     public tripsOnDisplay: string[] = [];
-    public deckTrips: string[][] = [];
+    public deckTrips: string[][] = [];//chunks of up to 3 cards each
 
     start() {
         Klondike.instance = this;
@@ -73,7 +73,7 @@ export class Klondike extends Component {
             console.log("click count is 1");
             this.timer += deltaTime;
         }
-        if (this.clickCount == 3) {
+        if (this.clickCount >= 3) {
             console.log("click count is 3");
             this.timer = 0;
             this.clickCount = 1;
@@ -187,8 +187,8 @@ export class Klondike extends Component {
         console.log(this.deckTrips);
         this.deckLocation = 0;
     }
-    DealFromDeck(): void {
-        console.log("DealFromDeck");
+    DealFromStock(): void {
+        console.log("Deal from stock");
         // add remaining cards to the discard pile
         this.DeckPile.children.forEach(child => {
             if (child.getComponent(UpdateSprite)) {
@@ -386,8 +386,9 @@ export class Klondike extends Component {
             yoffset = 0;
         }
         // this.slot1.removeFromParent();
-        // this.slot1.addChild(selected);//this makes the children move with the parents
+        // this.DeckPile.addChild(this.slot1);//this makes the children move with the parents
         this.slot1.setWorldPosition(selected.worldPosition.x, selected.worldPosition.y + yoffset, selected.worldPosition.z + 10);
+
         if (s1.inDeckPile) { // remove the cards from the top pile to prevent duplicate cards
             this.tripsOnDisplay.splice(this.tripsOnDisplay.indexOf(this.slot1.name), 1);
         }
@@ -436,12 +437,16 @@ export class Klondike extends Component {
                 console.log("the last card in the bottom pile is " + this.bottoms[s2.row][this.bottoms[s2.row].length - 1]);
                 console.log(s2.node.name + " is not the bottom card");
                 return true;
-            }
+            }   
         }
+    }
+    AddClick(): void {
+        console.log("add click");
+        this.clickCount += 1;
     }
     ResetClick(): void {
         console.log("reset click");
-        this.clickCount++;
+        this.clickCount = 0;
     }
     DoubleClick(): boolean {
         if (this.timer < this.doubleClickTimer && this.clickCount == 2) {

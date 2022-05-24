@@ -35,8 +35,8 @@ export class UpdateSprite extends Component {
         this.node.on(Node.EventType.MOUSE_DOWN, function (event) { // on mouse down
             // click card options
             console.log('Mouse down ' + this.node.name);
+            Klondike.instance.AddClick();
             Klondike.instance.Card(this.node);
-            Klondike.instance.ResetClick();
         }, this);
     }
 
