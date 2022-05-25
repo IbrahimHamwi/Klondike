@@ -2183,7 +2183,7 @@
         "__expectedType__": "cc.SpriteFrame"
       }
     ],
-    "card": {
+    "cardPrefab": {
       "__uuid__": "b80f8208-5138-494f-82cc-2fd4c44b9414",
       "__expectedType__": "cc.Prefab"
     },
@@ -2769,7 +2769,7 @@
     },
     "component": "",
     "_componentId": "ac76cwI6atHBaJ/NAZw4vep",
-    "handler": "",
+    "handler": "ResetScene",
     "customEventData": ""
   },
   {

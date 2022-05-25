@@ -10,15 +10,15 @@ export class Klondike extends Component {
 
     // sprite array for card faces
     @property({ type: SpriteFrame }) cardFaces: SpriteFrame[] = [];
-    @property({ type: Prefab }) card: Prefab = null;
+    @property({ type: Prefab }) cardPrefab: Prefab = null;
     @property({ type: Node }) deckButton: Node = null;
     @property({ type: Node }) topPos: Node[] = [];
     @property({ type: Node }) bottomPos: Node[] = [];
-    @property({ type: Node }) slot1: Node = null;
+    @property({ type: Node }) slot1: Node = null; // to store what previously has been selected
     @property({ type: Node }) DeckPile: Node = null;
 
     public deck: string[] = [];
-    public discardPile: string[] = [];
+    public discardPile: string[] = []; // whenever a card leaves the deck it gets added to the discard pile
     private trips: number = 0;
     private tripsRemainder: number = 0;
     private deckLocation: number = 0; //track where I am within the deck
@@ -127,7 +127,7 @@ export class Klondike extends Component {
             this.bottoms[i].forEach(card => {
                 let counter = i;
                 this.scheduleOnce(() => {
-                    let newCard = instantiate(this.card);
+                    let newCard = instantiate(this.cardPrefab);
                     let xoffset = newCard.getComponent(UITransform).contentSize.width / 2
                     newCard.setRotation(math.quat(0, 0, 0, 1));
                     newCard.name = card;
@@ -140,17 +140,22 @@ export class Klondike extends Component {
                     newCard.setWorldPosition(this.bottomPos[counter].worldPosition.x, this.bottomPos[counter].worldPosition.y + yoffset, this.bottomPos[counter].worldPosition.z - zoffset);
                     yoffset -= 30;
                     zoffset += 0.03;
-                    this.discardPile.push(card);
+                    // this.discardPile.push(card);
                 }, waitcounter * 0.1);
                 waitcounter++;
             });
         }
-        this.discardPile.forEach(card => {
-            if (Klondike.instance.deck.indexOf(card) != -1) {
-                Klondike.instance.deck.splice(Klondike.instance.deck.indexOf(card), 1);
-            }
-        })
+        this.discardPile = this.discardPile.filter(function (value, index, arr) {
+            return arr.indexOf(value) == index;
+        });
+        // console.log("discard pile: " + this.discardPile);
+        // this.discardPile.forEach(card => {
+        //     if (Klondike.instance.deck.indexOf(card) != -1) { // if the card is still in the deck
+        //         Klondike.instance.deck.splice(Klondike.instance.deck.indexOf(card), 1);// remove it from the deck
+        //     }
+        // })
         this.discardPile = [];
+        console.log("discard pile has been cleared");
     }
     KlondikeSort(): void {
         // sort the cards
@@ -160,7 +165,7 @@ export class Klondike extends Component {
             }
         }
     }
-    SortDeckIntoTrips(): void {
+    SortDeckIntoTrips(): void { // sort the cards into trips
         this.trips = Klondike.instance.deck.length / 3;
         this.tripsRemainder = Klondike.instance.deck.length % 3;
         this.deckTrips = [];
@@ -184,7 +189,6 @@ export class Klondike extends Component {
             this.deckTrips.push(myRemainders);
             this.trips += 1;
         }
-        console.log(this.deckTrips);
         this.deckLocation = 0;
     }
     DealFromStock(): void {
@@ -194,6 +198,9 @@ export class Klondike extends Component {
             if (child.getComponent(UpdateSprite)) {
                 Klondike.instance.deck.splice(Klondike.instance.deck.indexOf(child.name), 1);
                 this.discardPile.push(child.name);
+                console.log("removed: " + child.name);
+                console.log("discard pile: " + this.discardPile);
+                console.log("length of discard pile: " + this.discardPile.length);
                 child.destroy();
             }
         });
@@ -207,8 +214,8 @@ export class Klondike extends Component {
             let zoffset = 3;
             this.deckTrips[this.deckLocation].forEach(card => {
                 console.log("card: " + card);
-                let newTopCard: Node = instantiate(this.card); // instantiate a new card
-                this.DeckPile.addChild(newTopCard); // add the card to the deck button
+                let newTopCard: Node = instantiate(this.cardPrefab); // instantiate a new card
+                this.DeckPile.addChild(newTopCard);
                 newTopCard.setWorldPosition(
                     this.deckButton.worldPosition.x + xoffset,
                     this.deckButton.worldPosition.y,
@@ -218,7 +225,7 @@ export class Klondike extends Component {
                 zoffset += 3;
                 newTopCard.name = card;
                 this.tripsOnDisplay.push(card);
-                newTopCard.getComponent(Selectable).faceup = true;
+                newTopCard.getComponent(Selectable).faceup = true; // set the card to face up
                 newTopCard.getComponent(Selectable).inDeckPile = true;
             });
             this.deckLocation++;
@@ -231,6 +238,7 @@ export class Klondike extends Component {
     RestackTopDeck(): void {
         Klondike.instance.deck == [];// clear the deck
         this.discardPile.forEach(card => {
+            console.log("length of discard pile: " + this.discardPile.length);
             Klondike.instance.deck.push(card);
         })
         this.discardPile = [];
@@ -260,14 +268,6 @@ export class Klondike extends Component {
     }
 
     Card(selected: Node): void {
-        if (!this.slot1) {
-            this.slot1 = this.node;
-        }
-        console.log("Clicked on card" + selected.name);
-        if (this.slot1 == this.node) {
-            console.log("slot1 is empty");
-            this.slot1 = selected;
-        }
 
         if (!selected.getComponent(Selectable).faceup) {//if the card clicked on is facedown
             console.log("card is facedown");
@@ -293,34 +293,39 @@ export class Klondike extends Component {
                 }
             }
         }
+        else {
+            // if the card is face up
+            // if there is no currently selected card
+            // select it
 
-        // if the card is face up
-        // if there is no currently selected card
-        // select it
+            if (this.slot1 == this.node) { //not null because we pass in this gameobject instead
+                console.log("slot1 is empty");
+                this.slot1 = selected;
+            }
 
-        //  if there is already a card selected(and it is not the same card)
-        else if (this.slot1 != selected) {
+            //if there is already a card selected(and it is not the same card)
+            else if (this.slot1 != selected) {
             console.log("slot1 is not empty");
             // if the new card is eligible to stack on the old card
-            if (this.Stackable(selected)) {
+                if (this.Stackable(selected)) {
                 // stack the cards
                 this.Stack(selected);
                 console.log("cards stacked");
 
-            } else {
+                } else {
                 // select the new card
                 this.slot1 = selected;
                 console.log("selecting new card " + selected.name);
+                }
             }
-        }
-        // if the card is eligible to fly up top then do it
-        else if (this.slot1 == selected) {// else if there is already a card selected and it is the same card
+            // if the card is eligible to fly up top then do it
+            else if (this.slot1 == selected) {// else if there is already a card selected and it is the same card
             if (this.DoubleClick()) {// if the time is short enough the it is a double click
                 //attempt autostack
                 this.AutoStack(selected);
             }
+            }
         }
-
     }
     Stackable(selected: Node): boolean {
         let s1: Selectable = this.slot1.getComponent(Selectable);
@@ -335,8 +340,8 @@ export class Klondike extends Component {
                     console.log("s1 and s2 are suited or s1 is Ace and s2 is null");
                     if (s1.value == s2.value + 1) {
                         console.log("s1 and s2 are one value apart");
-                        return true;
                         console.log("stackable");
+                        return true;
                     }
                 }
                 else {
@@ -387,7 +392,14 @@ export class Klondike extends Component {
         }
         // this.slot1.removeFromParent();
         // this.DeckPile.addChild(this.slot1);//this makes the children move with the parents
-        this.slot1.setWorldPosition(selected.worldPosition.x, selected.worldPosition.y + yoffset, selected.worldPosition.z + 10);
+        // this.slot1.setWorldPosition(selected.worldPosition.x,
+        //     selected.worldPosition.y + yoffset,
+        //     selected.worldPosition.z);
+        // make s1 child of s2
+        selected.addChild(this.slot1);
+        this.slot1.setPosition(0, yoffset, 0);
+        // this.slot1.setSiblingIndex(1);
+        console.log("position of slot1: " + this.slot1.worldPosition);
 
         if (s1.inDeckPile) { // remove the cards from the top pile to prevent duplicate cards
             this.tripsOnDisplay.splice(this.tripsOnDisplay.indexOf(this.slot1.name), 1);
