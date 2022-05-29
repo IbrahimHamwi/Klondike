@@ -7,10 +7,10 @@ export class Selectable extends Component {
 
     @property({ type: Boolean }) top: boolean = false;
     @property({ type: Number }) row: number = 0;
-    suit: string;
-    value: number = 0;
-    faceup: boolean = false;
-    inDeckPile: boolean = false;
+    @property({ type: String }) suit: string;
+    @property({ type: Number }) value: number = 0;
+    @property({ type: Boolean }) faceup: boolean = false;
+    @property({ type: Boolean }) inDeckPile: boolean = false;
 
     private valueString: string;
 
