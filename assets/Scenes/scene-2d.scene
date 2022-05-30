@@ -440,6 +440,9 @@
     "__prefab": null,
     "top": true,
     "row": 0,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "11+CEGPt5Jk6/S5ArulV3H"
   },
   {
@@ -578,6 +581,9 @@
     "__prefab": null,
     "top": true,
     "row": 1,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "cepMJWCp5AAp7632Sy++qQ"
   },
   {
@@ -716,6 +722,9 @@
     "__prefab": null,
     "top": true,
     "row": 2,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "47jXFrb89EW4mfYY6f6nLf"
   },
   {
@@ -854,6 +863,9 @@
     "__prefab": null,
     "top": true,
     "row": 3,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "09605kUYBAcaqBTU4KzZfy"
   },
   {
@@ -1064,6 +1076,9 @@
     "__prefab": null,
     "top": false,
     "row": 0,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "89U2MwU3RB044IkY3c1twh"
   },
   {
@@ -1202,6 +1217,9 @@
     "__prefab": null,
     "top": false,
     "row": 1,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "b6QzzpywBCoqYn2xecZN2Q"
   },
   {
@@ -1340,6 +1358,9 @@
     "__prefab": null,
     "top": false,
     "row": 2,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "11Mfj2HwJCoqji2fWFVAMB"
   },
   {
@@ -1478,6 +1499,9 @@
     "__prefab": null,
     "top": false,
     "row": 3,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "ea901vsYRA7rY/STIPNMFc"
   },
   {
@@ -1616,6 +1640,9 @@
     "__prefab": null,
     "top": false,
     "row": 4,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "bdfkfydbFIFZwEyGo3Eyu9"
   },
   {
@@ -1754,6 +1781,9 @@
     "__prefab": null,
     "top": false,
     "row": 5,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "6cKY6nDJRJKYEY2uNdbX3i"
   },
   {
@@ -1892,6 +1922,9 @@
     "__prefab": null,
     "top": false,
     "row": 6,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": "191swPekZLvZx+lTr5x4OT"
   },
   {

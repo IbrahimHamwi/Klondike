@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, SpriteFrame, Sprite, Color } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Sprite, Color, Event } from 'cc';
 import { Klondike } from './Klondike';
 import { Selectable } from './Selectable';
 const { ccclass, property } = _decorator;
@@ -37,6 +37,7 @@ export class UpdateSprite extends Component {
             console.log('Mouse down ' + this.node.name);
             Klondike.instance.AddClick();
             Klondike.instance.Card(this.node);
+            event.propagationStopped = true;
         }, this);
     }
 
