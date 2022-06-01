@@ -23,7 +23,7 @@ export class Klondike extends Component {
     private tripsRemainder: number = 0;
     private deckLocation: number = 0; //track where I am within the deck
     private timer: number = 0;
-    private doubleClickTimer: number = 1;
+    private doubleClickTimer: number = 0.3;
     private clickCount: number = 0;
 
     public static suits: string[] = ["C", "D", "H", "S"];

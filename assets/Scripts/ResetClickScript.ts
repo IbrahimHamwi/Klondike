@@ -8,7 +8,7 @@ export class ResetClickScript extends Component {
         this.node.on(Node.EventType.MOUSE_DOWN, function (event) { // on mouse down
             // click card options
             console.log('Mouse down ' + this.node.name);
-            Klondike.instance.ResetClick();
+            Klondike.instance.AddClick();
         }, this);
     }
 
