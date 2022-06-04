@@ -284,7 +284,7 @@ export class Klondike extends Component {
                     // console.log("card is clicked on twice");
                     if (this.DoubleClick()) {
                         // console.log("double click");
-                        // this.AutoStack(selected);//attempt autostack
+                        this.AutoStack(selected);//attempt autostack
                     }
                 }
                 else {
@@ -320,10 +320,10 @@ export class Klondike extends Component {
             }
             // if the card is eligible to fly up top then do it
             else if (this.slot1 == selected) {// else if there is already a card selected and it is the same card
-            if (this.DoubleClick()) {// if the time is short enough the it is a double click
+                if (this.DoubleClick()) {// if the time is short enough the it is a double click
                 //attempt autostack
-                // this.AutoStack(selected);
-            }
+                    this.AutoStack(selected);
+                }
             }
         }
     }
@@ -467,10 +467,9 @@ export class Klondike extends Component {
     }
     DoubleClick(): boolean {
         if (this.timer < this.doubleClickTimer && this.clickCount == 2) {
-            // console.log("double click");
+            console.log("double click");
             return true;
         } else {
-
             // console.log("single click");
             // console.log("click count is " + this.clickCount);
             // console.log("timer is " + this.timer + " and double click timer is " + this.doubleClickTimer);
@@ -495,32 +494,43 @@ export class Klondike extends Component {
                 }
             }
             else if (this.topPos[i].getComponent(Selectable).suit == this.slot1.getComponent(Selectable).suit && this.topPos[i].getComponent(Selectable).value == this.slot1.getComponent(Selectable).value - 1) {
-                // console.log("selected card is one value away from the top card");
+                console.log("selected card is one value away from the top card");
                 if (this.HasNoChildren(this.slot1)) { //if it is the last card (if it has no children)
+                    console.log("slot 1 " + this.slot1.name + " has no children");
                     this.slot1 = selected;
                     // find a top spot that matches the conditions for auto stacking if it exists
                     let lastCardName: string = stack.suit + stack.value.toString();
                     if (stack.value == 1) {
                         lastCardName = stack.suit + "A";
+                        console.log("last card name is " + lastCardName);
                     }
                     if (stack.value == 11) {
                         lastCardName = stack.suit + "J";
+                        console.log("last card name is " + lastCardName);
+
                     }
                     if (stack.value == 12) {
                         lastCardName = stack.suit + "Q";
+                        console.log("last card name is " + lastCardName);
                     }
                     if (stack.value == 13) {
                         lastCardName = stack.suit + "K";
+                        console.log("last card name is " + lastCardName);
                     }
                     let lastCard = Klondike.instance.node.parent.getChildByName(lastCardName);
-                    // console.log("last card is " + lastCard.name);
-                    this.Stack(lastCard);
-                    break;
-                } else {
-                    // console.log("selected card is not the last card");
+                    console.log("last card is " + lastCard.name);
+                    // // this.Stack(lastCard);
+                    // if (lastCard.getComponent(Selectable)) {
+                    //     console.log("last card is selectable");
+                    //     // this.Stack(lastCard);
+                    // } else { console.log("last card is not selectable"); }
+                    // break;
+                }
+                else {
+                    console.log("selected card is not the last card");
                 }
             } else {
-                // console.log("no conditions met");
+                console.log("selected card is not one value away from the top card");
             }
         }
     }
