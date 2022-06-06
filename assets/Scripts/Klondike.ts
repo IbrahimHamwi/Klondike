@@ -1,4 +1,5 @@
-import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find, CCObject } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find, CCObject, tween, Vec3 } from 'cc';
+import { AudioController } from './AudioController';
 import { Selectable } from './Selectable';
 import { TopScript } from './TopScript';
 import { UpdateSprite } from './UpdateSprite';
@@ -32,6 +33,7 @@ export class Klondike extends Component {
     public tops: string[][] = [];
     public tripsOnDisplay: string[] = [];
     public deckTrips: string[][] = [];//chunks of up to 3 cards each
+
 
     start() {
         Klondike.instance = this;
@@ -93,6 +95,7 @@ export class Klondike extends Component {
     PlayCards(): void {
         Klondike.instance.deck = Klondike.GenerateDeck(); // generate the deck
         Klondike.instance.deck = Klondike.ShuffleDeck(Klondike.instance.deck);// shuffle the deck
+        AudioController.instance.playPlayCardsSound();
         // console.log("size of deck: " + Klondike.instance.deck.length);
         this.KlondikeSort(); // sort the cards
         this.KlondikeDeal(); // deal the cards
@@ -208,6 +211,7 @@ export class Klondike extends Component {
 
 
         if (this.deckLocation < this.trips) {
+            AudioController.instance.playStockSound();
             //draw 3 new cards
             //console.log("draw 3 new cards");
             this.tripsOnDisplay = [];// clear the trips on display
@@ -222,7 +226,7 @@ export class Klondike extends Component {
                     this.deckButton.worldPosition.y,
                     this.deckButton.worldPosition.z + zoffset); // set the position of the card
                 newTopCard.setRotation(math.quat(0, 0, 0, 1));
-                xoffset += 25;
+                xoffset += 40;
                 zoffset += 3;
                 newTopCard.name = card;
                 this.tripsOnDisplay.push(card);
@@ -274,6 +278,7 @@ export class Klondike extends Component {
             if (!this.Blocked(selected)) {//if the the card clicked on is not blocked
                 // console.log("card is not blocked");
                 selected.getComponent(Selectable).faceup = true;// flip it over
+                AudioController.instance.playCardFlipSound();
                 this.slot1 = this.node;
             }
         }
@@ -284,7 +289,7 @@ export class Klondike extends Component {
                     // console.log("card is clicked on twice");
                     if (this.DoubleClick()) {
                         // console.log("double click");
-                        this.AutoStack(selected);//attempt autostack
+                        // this.AutoStack(selected);//attempt autostack
                     }
                 }
                 else {
@@ -322,7 +327,7 @@ export class Klondike extends Component {
             else if (this.slot1 == selected) {// else if there is already a card selected and it is the same card
                 if (this.DoubleClick()) {// if the time is short enough the it is a double click
                 //attempt autostack
-                    this.AutoStack(selected);
+                    // this.AutoStack(selected);
                 }
             }
         }
@@ -383,6 +388,7 @@ export class Klondike extends Component {
         return false;
     }
     Stack(selected: Node): void {
+        AudioController.instance.playStackSound();
         //if on top king or empty bottom stack cards in plance
         //else stack the cards with a negative y offset
         // console.log("stacking cards");
@@ -395,6 +401,7 @@ export class Klondike extends Component {
         }
         // this.slot1.removeFromParent();
         selected.addChild(this.slot1);
+        // tween(this.slot1).to(0.5, { position: new Vec3(0, yoffset, 0) }).start();
         this.slot1.setPosition(0, yoffset, 0);
         // console.log("position of slot1: " + this.slot1.position);
 

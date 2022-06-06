@@ -110,7 +110,7 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "c354fc12-83e2-41a0-a982-1ed72c187ffc@f9941",
+      "__uuid__": "f000cc34-183c-41c2-a32e-058ca1299865@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 0,
@@ -145,7 +145,7 @@
     },
     "cardFace": null,
     "cardBack": {
-      "__uuid__": "c354fc12-83e2-41a0-a982-1ed72c187ffc@f9941",
+      "__uuid__": "f000cc34-183c-41c2-a32e-058ca1299865@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_id": ""
@@ -165,6 +165,11 @@
     "__prefab": {
       "__id__": 8
     },
+    "top": false,
+    "row": 0,
+    "value": 0,
+    "faceup": false,
+    "inDeckPile": false,
     "_id": ""
   },
   {
