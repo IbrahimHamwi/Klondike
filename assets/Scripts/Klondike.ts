@@ -524,8 +524,15 @@ export class Klondike extends Component {
                         lastCardName = stack.suit + "K";
                         console.log("last card name is " + lastCardName);
                     }
-                    let lastCard = Klondike.instance.node.parent.getChildByName(lastCardName);
-                    console.log("last card is " + lastCard.name);
+                    // let lastCard = Klondike.instance.node.parent.getChildByName(lastCardName);
+                    // for (let i = 0; i < this.bottoms.length; i++) {
+                    //     for (let j = 0; j < this.bottoms[i].length; j++) {
+                    //         if (this.bottoms[i][j] == lastCardName) {
+                    //             let lastCard = this.bottoms[i][j];
+                    //             console.log("last card is " + lastCard);
+                    //         }
+                    //     }
+                    // }
                     // // this.Stack(lastCard);
                     // if (lastCard.getComponent(Selectable)) {
                     //     console.log("last card is selectable");
