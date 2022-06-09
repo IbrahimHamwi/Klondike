@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, SpriteFrame, Sprite, Color, Event } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Sprite, Color, Event, instantiate } from 'cc';
 import { Klondike } from './Klondike';
 import { Selectable } from './Selectable';
 const { ccclass, property } = _decorator;
@@ -7,7 +7,9 @@ const { ccclass, property } = _decorator;
 export class UpdateSprite extends Component {
     @property({ type: SpriteFrame }) cardFace: SpriteFrame;
     @property({ type: SpriteFrame }) cardBack: SpriteFrame;
+    @property({ type: SpriteFrame }) cardOutLine: SpriteFrame;
     @property({ type: Sprite }) spriteRenderer: Sprite;
+    @property({ type: Sprite }) outlineRenderer: Sprite;
     private selectable: Selectable;
     private klondike: Klondike;
 
@@ -30,6 +32,7 @@ export class UpdateSprite extends Component {
             i++;
         }
         this.spriteRenderer = this.node.getComponent(Sprite);
+        this.outlineRenderer = this.node.getComponentInChildren(Sprite);
         this.selectable = this.node.getComponent(Selectable);
 
         this.node.on(Node.EventType.MOUSE_DOWN, function (event) { // on mouse down
@@ -51,9 +54,9 @@ export class UpdateSprite extends Component {
         if (Klondike.instance.slot1) {
 
             if (this.node.name == Klondike.instance.slot1.name) {
-                this.spriteRenderer.color = Color.YELLOW;
+                this.outlineRenderer.spriteFrame = this.cardOutLine;
             } else {
-                this.spriteRenderer.color = Color.WHITE;
+                this.outlineRenderer.spriteFrame = null;
             }
         }
     }

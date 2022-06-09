@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find, CCObject, tween, Vec3 } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find, CCObject, tween, Vec3, v3, Vec2 } from 'cc';
 import { AudioController } from './AudioController';
 import { Selectable } from './Selectable';
 import { TopScript } from './TopScript';
@@ -401,7 +401,7 @@ export class Klondike extends Component {
         }
         // this.slot1.removeFromParent();
         selected.addChild(this.slot1);
-        // tween(this.slot1).to(0.5, { position: new Vec3(0, yoffset, 0) }).start();
+        // tween(this.slot1).to(2.5, { position: new Vec3(0, yoffset, 0) }).start();
         this.slot1.setPosition(0, yoffset, 0);
         // console.log("position of slot1: " + this.slot1.position);
 
