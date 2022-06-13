@@ -59,6 +59,9 @@ export class UpdateSprite extends Component {
                 this.outlineRenderer.spriteFrame = null;
             }
         }
+        if (!Klondike.instance.Blocked(this.node)) {
+            this.node.getComponent(Selectable).faceup = true;
+        }
     }
 }
 

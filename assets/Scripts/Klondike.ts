@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find, CCObject, tween, Vec3, v3, Vec2 } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Prefab, instantiate, Sprite, resources, quat, math, UITransform, find, CCObject, tween, Vec3, v3, Vec2, Tween } from 'cc';
 import { AudioController } from './AudioController';
 import { Selectable } from './Selectable';
 import { TopScript } from './TopScript';
@@ -87,7 +87,6 @@ export class Klondike extends Component {
         }
         if (this.clickCount == 2) {
             console.log("click count is 2");
-
         }
 
     }
@@ -327,7 +326,7 @@ export class Klondike extends Component {
             else if (this.slot1 == selected) {// else if there is already a card selected and it is the same card
                 if (this.DoubleClick()) {// if the time is short enough the it is a double click
                 //attempt autostack
-                    // this.AutoStack(selected);
+                // this.AutoStack(selected);
                 }
             }
         }
@@ -400,6 +399,10 @@ export class Klondike extends Component {
             yoffset = 0;
         }
         // this.slot1.removeFromParent();
+        // let ballTween = new Tween(this.slot1)
+        //     .call(() => selected.addChild(this.slot1))
+        //     .to(2, { position: new Vec3(selected.position.x, 0, 0) })
+        //     .start();
         selected.addChild(this.slot1);
         // tween(this.slot1).to(2.5, { position: new Vec3(0, yoffset, 0) }).start();
         this.slot1.setPosition(0, yoffset, 0);
@@ -437,29 +440,29 @@ export class Klondike extends Component {
     Blocked(selected: Node): boolean {
         let s2: Selectable = selected.getComponent(Selectable);
         if (s2.inDeckPile == true) { //if the card is in the deck pile
-            console.log("card is in the deck pile");
+            // console.log("card is in the deck pile");
             if (s2.node.name == this.tripsOnDisplay[this.tripsOnDisplay.length - 1]) { //if the card is the last card in the deck pile
-                console.log("the selected card " + s2.node.name + " is the last card in the deck pile");
-                console.log("card is not blocked");
+                // console.log("the selected card " + s2.node.name + " is the last card in the deck pile");
+                // console.log("card is not blocked");
                 return false;
             }
             else {
-                console.log(s2.node.name + " is blocked by " + this.tripsOnDisplay[this.tripsOnDisplay.length - 1]);
-                console.log("card is blocked");
+                // console.log(s2.node.name + " is blocked by " + this.tripsOnDisplay[this.tripsOnDisplay.length - 1]);
+                // console.log("card is blocked");
                 return true;
             }
         }
         else {
-            console.log("the selected card " + s2.node.name + " is in the bottoms");
+            // console.log("the selected card " + s2.node.name + " is in the bottoms");
             if (s2.node.name == this.bottoms[s2.row][this.bottoms[s2.row].length - 1]) { //check if is the bottom card
-                console.log("the selected card row is " + s2.row);
-                console.log(s2.node.name + " is the bottom card");
-                console.log("card is not blocked");
+                // console.log("the selected card row is " + s2.row);
+                // console.log(s2.node.name + " is the bottom card");
+                // console.log("card is not blocked");
                 return false;
             } else {
-                console.log("card is blocked by " + this.bottoms[s2.row][this.bottoms[s2.row].length - 1]);
-                console.log(s2.node.name + " is not the bottom card");
-                console.log("card is blocked");
+                // console.log("card is blocked by " + this.bottoms[s2.row][this.bottoms[s2.row].length - 1]);
+                // console.log(s2.node.name + " is not the bottom card");
+                // console.log("card is blocked");
                 return true;
             }   
         }
@@ -502,7 +505,7 @@ export class Klondike extends Component {
             }
             else if (this.topPos[i].getComponent(Selectable).suit == this.slot1.getComponent(Selectable).suit && this.topPos[i].getComponent(Selectable).value == this.slot1.getComponent(Selectable).value - 1) {
                 console.log("selected card is one value away from the top card");
-                if (this.HasNoChildren(this.slot1)) { //if it is the last card (if it has no children)
+                if (this.slot1.children.length == 0) { //if it is the last card (if it has no children)
                     console.log("slot 1 " + this.slot1.name + " has no children");
                     this.slot1 = selected;
                     // find a top spot that matches the conditions for auto stacking if it exists
@@ -524,21 +527,19 @@ export class Klondike extends Component {
                         lastCardName = stack.suit + "K";
                         console.log("last card name is " + lastCardName);
                     }
-                    // let lastCard = Klondike.instance.node.parent.getChildByName(lastCardName);
-                    // for (let i = 0; i < this.bottoms.length; i++) {
-                    //     for (let j = 0; j < this.bottoms[i].length; j++) {
-                    //         if (this.bottoms[i][j] == lastCardName) {
-                    //             let lastCard = this.bottoms[i][j];
-                    //             console.log("last card is " + lastCard);
-                    //         }
-                    //     }
-                    // }
-                    // // this.Stack(lastCard);
-                    // if (lastCard.getComponent(Selectable)) {
-                    //     console.log("last card is selectable");
-                    //     // this.Stack(lastCard);
-                    // } else { console.log("last card is not selectable"); }
-                    // break;
+                    let lastCard: Node = null;
+                    for (let i = 0; i < this.bottomPos.length; i++) {
+                        // console.log("checking bottom " + i);
+                        for (let j = 0; j < this.bottomPos[i].children.length; j++) {
+                            // console.log("checking bottom " + i + " child " + j);
+                            if (this.bottomPos[i].children[j].name == lastCardName) {
+                                // console.log("found last card");
+                                lastCard = this.bottomPos[i].children[j];
+                                this.Stack(lastCard);
+                                break;
+                            }
+                        }
+                    }
                 }
                 else {
                     console.log("selected card is not the last card");
