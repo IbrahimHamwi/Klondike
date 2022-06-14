@@ -214,7 +214,7 @@ export class Klondike extends Component {
             //draw 3 new cards
             //console.log("draw 3 new cards");
             this.tripsOnDisplay = [];// clear the trips on display
-            let xoffset = 130;
+            let xoffset = 60;
             let zoffset = 3;
             this.deckTrips[this.deckLocation].forEach(card => {
                 // console.log("card to be instantiated: " + card);
@@ -225,7 +225,7 @@ export class Klondike extends Component {
                     this.deckButton.worldPosition.y,
                     this.deckButton.worldPosition.z + zoffset); // set the position of the card
                 newTopCard.setRotation(math.quat(0, 0, 0, 1));
-                xoffset += 40;
+                xoffset += 20;
                 zoffset += 3;
                 newTopCard.name = card;
                 this.tripsOnDisplay.push(card);
