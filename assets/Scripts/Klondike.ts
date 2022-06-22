@@ -59,6 +59,9 @@ export class Klondike extends Component {
 
         //deal new cards
         this.PlayCards();
+
+
+
     }
     ClearTopValues(): void {
         let tops = this.node.parent.getComponentsInChildren(TopScript);
@@ -399,13 +402,15 @@ export class Klondike extends Component {
             yoffset = 0;
         }
         // this.slot1.removeFromParent();
-        // let ballTween = new Tween(this.slot1)
-        //     .call(() => selected.addChild(this.slot1))
-        //     .to(2, { position: new Vec3(selected.position.x, 0, 0) })
-        //     .start();
-        selected.addChild(this.slot1);
+        // this.slot1.setPosition(this.slot1.worldPosition);
+        let ballTween = new Tween(this.slot1)
+            // .call(() => selected.addChild(this.slot1))
+            // .to(2, { position: this.slot1.getPosition() })
+            .to(2, { position: selected.getPosition() })
+            .start();
+        // selected.addChild(this.slot1);
         // tween(this.slot1).to(2.5, { position: new Vec3(0, yoffset, 0) }).start();
-        this.slot1.setPosition(0, yoffset, 0);
+        // this.slot1.setPosition(0, yoffset, 0);
         // console.log("position of slot1: " + this.slot1.position);
 
         if (s1.inDeckPile) { // remove the cards from the top pile to prevent duplicate cards
@@ -435,7 +440,7 @@ export class Klondike extends Component {
             s1.top = false;
         }
         //after completing move reset slot1 to be essentially null as being null will break the logic
-        this.slot1 = this.node;
+        // this.slot1 = this.node;
     }
     Blocked(selected: Node): boolean {
         let s2: Selectable = selected.getComponent(Selectable);
