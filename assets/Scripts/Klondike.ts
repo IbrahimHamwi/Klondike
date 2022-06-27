@@ -143,6 +143,8 @@ export class Klondike extends Component {
                         newCard.getComponent(Selectable).faceup = true;
                     }
                     this.bottomPos[counter].addChild(newCard);
+                    // set the new card content size same as parent
+                    newCard.getComponent(UITransform).contentSize = this.bottomPos[counter].getComponent(UITransform).contentSize;
                     newCard.setWorldPosition(this.bottomPos[counter].worldPosition.x, this.bottomPos[counter].worldPosition.y + yoffset, this.bottomPos[counter].worldPosition.z - zoffset);
                     yoffset -= 30;
                     zoffset += 0.03;
@@ -403,14 +405,14 @@ export class Klondike extends Component {
         }
         // this.slot1.removeFromParent();
         // this.slot1.setPosition(this.slot1.worldPosition);
-        let ballTween = new Tween(this.slot1)
-            // .call(() => selected.addChild(this.slot1))
-            // .to(2, { position: this.slot1.getPosition() })
-            .to(2, { position: selected.getPosition() })
-            .start();
-        // selected.addChild(this.slot1);
+        // let ballTween = new Tween(this.slot1)
+        //     // .call(() => selected.addChild(this.slot1))
+        //     // .to(2, { position: this.slot1.getPosition() })
+        //     .to(2, { position: selected.getPosition() })
+        //     .start();
+        selected.addChild(this.slot1);
         // tween(this.slot1).to(2.5, { position: new Vec3(0, yoffset, 0) }).start();
-        // this.slot1.setPosition(0, yoffset, 0);
+        this.slot1.setPosition(0, yoffset, 0);
         // console.log("position of slot1: " + this.slot1.position);
 
         if (s1.inDeckPile) { // remove the cards from the top pile to prevent duplicate cards
