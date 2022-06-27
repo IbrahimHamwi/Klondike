@@ -225,6 +225,8 @@ export class Klondike extends Component {
                 // console.log("card to be instantiated: " + card);
                 let newTopCard: Node = instantiate(this.cardPrefab); // instantiate a new card
                 this.DeckPile.addChild(newTopCard);
+                // let newTopCard content size same as parent
+                newTopCard.getComponent(UITransform).contentSize = this.bottomPos[0].getComponent(UITransform).contentSize;
                 newTopCard.setWorldPosition(
                     this.deckButton.worldPosition.x + xoffset,
                     this.deckButton.worldPosition.y,
