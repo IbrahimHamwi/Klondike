@@ -35,7 +35,7 @@ export class UpdateSprite extends Component {
         this.outlineRenderer = this.node.getComponentInChildren(Sprite);
         this.selectable = this.node.getComponent(Selectable);
 
-        this.node.on(Node.EventType.MOUSE_DOWN, function (event) { // on mouse down
+        this.node.on(Node.EventType.TOUCH_START, function (event) { // on mouse down
             // click card options
             console.log('Mouse down ' + this.node.name);
             Klondike.instance.AddClick();
